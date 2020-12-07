@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 /* Styles */
 import '../assets/styles/App.scss';
@@ -11,37 +11,41 @@ import CarouselItem from '../components/CarouselItem';
 import Categories from '../components/Categories';
 import Footer from '../components/Footer';
 
-const App = () => (
-    <div className="App">
-        <Header />
-        <Search />
+const App = () => {
+    const[ videos, setVideos ] = useState({ mylist: [], trends: [], originals: [] });
 
-        <Categories title="Seguir viendo">
-            <Carousel>
-                <CarouselItem />  
-                <CarouselItem />  
-                <CarouselItem />  
-            </Carousel>    
-        </Categories> 
+    useEffect(() => {
+        fetch('http://localhost:3000/initalState')
+        .then(response => response.json())
+        .then(data => setVideos(data));
+    }, []);
 
-        <Categories title="Mi lista">
-            <Carousel>
-                <CarouselItem />  
-                <CarouselItem />  
-                <CarouselItem />  
-            </Carousel>    
-        </Categories> 
+    return(
+        <div className="App">
+            <Header />
+            <Search />
 
-        <Categories title="Populares">
-            <Carousel>
-                <CarouselItem />  
-                <CarouselItem />  
-                <CarouselItem />  
-            </Carousel>    
-        </Categories> 
+            {videos.mylist.length > 0 &&
+                <Categories title="Mi lista">
+                    <Carousel>
+                        <CarouselItem />  
+                        <CarouselItem />  
+                        <CarouselItem />  
+                    </Carousel>    
+                </Categories> 
+            }
 
-        <Footer />      
-    </div>
-)
+            <Categories title="Tendencias">
+                <Carousel>
+                    {videos.trends.map(item =>
+                        <CarouselItem key={item.id} {...item} /> 
+                    )} 
+                </Carousel>    
+            </Categories> 
+
+            <Footer />      
+        </div>
+    )
+};
 
 export default App;
